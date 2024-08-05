@@ -20,7 +20,7 @@ const CardTemplate = ({
 
 const TodayCard = async () => {
   noCache();
-  const today = await Today.findToday();
+  const today = await Today.sumToday();
   const caption: string = "Today";
   return (
     <CardTemplate
@@ -31,23 +31,23 @@ const TodayCard = async () => {
 };
 
 const Last7DaysCard = async () => {
-  const pastweek = await PastWeek.getToday();
+  const pastweek = await PastWeek.sum7Days();
   const caption: string = "Last 7 Days";
   return (
     <CardTemplate
       caption={caption}
-      value={numeral(pastweek?.total_expenses ?? 0).format("0.00a")}
+      value={numeral(pastweek ?? 0).format("0.00a")}
     />
   );
 };
 
 const Last30DaysCard = async () => {
-  const pastmonth = await PastMonth.getToday();
+  const pastmonth = await PastMonth.sum30Days();
   const caption: string = "Last 30 Days";
   return (
     <CardTemplate
       caption={caption}
-      value={numeral(pastmonth?.total_expenses ?? 0).format("0.00a")}
+      value={numeral(pastmonth ?? 0).format("0.00a")}
     />
   );
 };

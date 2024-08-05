@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Expenses } from "@/lib/model/pocketbase";
 import { currentUser } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   const reqBody = await req.json();
@@ -8,11 +9,11 @@ export async function POST(req: Request) {
 
   const page = reqBody.page ?? 1;
 
-  const purchaes = await Expenses.findMyExpenses(page, 10);
+  const purchase = await Expenses.findMyExpenses(page, 10);
 
   return NextResponse.json(
     {
-      data: purchaes,
+      data: purchase,
     },
     { status: 200 }
   );
@@ -28,8 +29,13 @@ export async function PUT(req: Request) {
     status = 401;
     resData.message = "Unauthorized";
   } else {
-    const res = await Expenses.save(reqBody);
-    console.log(res);
+    try {
+      const res = await Expenses.save(reqBody);
+      revalidatePath("/");
+    } catch (error) {
+      status = 500;
+      resData = { message: "Error saving expense" };
+    }
   }
 
   return NextResponse.json(resData, { status: status });

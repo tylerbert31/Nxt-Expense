@@ -10,9 +10,10 @@ import {
   Prev7Days,
   BarGraphTemplateLoader,
 } from "./minified/bargraph";
-import PurchaseTable from "./minified/table";
 import User from "./User";
 import { currentUser } from "@clerk/nextjs/server";
+import AddExpense from "./addExpense";
+import PurchaseTable from "./minified/table_server";
 
 export async function Expense() {
   const user = await currentUser();
@@ -23,7 +24,8 @@ export async function Expense() {
         <User />
       </header>
       <main className="flex-1 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <AddExpense />
           <Suspense fallback={<CardTemplateLoader />}>
             <TodayCard />
           </Suspense>

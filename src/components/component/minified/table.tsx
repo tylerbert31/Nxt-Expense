@@ -65,33 +65,6 @@ const PurchaseTableData = () => {
                 <TableCell>₱ {item.amount}</TableCell>
               </TableRow>
             ))}
-          {items && !isLoading && (
-            <TableRow className="hover:bg-[unset] dark:hover:bg-[unset]">
-              <TableCell
-                colSpan={3}
-                className="space-x-2 justify-center my-0 mx-auto"
-              >
-                <Button
-                  variant={"outline"}
-                  onClick={handlePrevPage}
-                  className="dark:bg-slate-50 text-gray-700"
-                  disabled={page === 1}
-                >
-                  Prev
-                </Button>
-                <Button
-                  variant={"outline"}
-                  onClick={handleNextPage}
-                  className="dark:bg-slate-50 text-gray-700"
-                  disabled={
-                    page === result.totalPages || result.totalPages === 0
-                  }
-                >
-                  Next
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
           {isLoading && (
             <TableRow className="hover:bg-[unset] dark:hover:bg-[unset]">
               <TableCell className="text-center" colSpan={3}>

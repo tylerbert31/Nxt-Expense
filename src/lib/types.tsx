@@ -9,10 +9,10 @@ export const ExpenseSchema = z.object({
       message: "User ID is invalid",
     })
     .optional(),
-  amount: z.number().min(0, {
+  amount: z.number().min(1, {
     message: "Amount should be greater than 0",
   }),
-  description: z.string(),
+  description: z.string().min(3),
   customCreatedAt: z.string().datetime().optional(),
 });
 

@@ -1,7 +1,6 @@
 import PocketBase from "pocketbase";
 import { PrismaClient } from "@prisma/client";
 import { currentUser } from "@clerk/nextjs/server";
-import type { User } from "@clerk/nextjs/server";
 import { ExpenseSchema, DateTimeSchema, DateSchema } from "../types";
 import { format } from "date-fns";
 import { z } from "zod";
@@ -76,7 +75,11 @@ class AppModel {
     }
   }
 
-  async findToday() {
+  /**
+   * Find the sum of expenses for today
+   * @returns {Promise<number | any>}
+   */
+  async sumToday(): Promise<number | any> {
     const { year, month, day } = this.getDateBreakdown();
     const user = await currentUser();
 
@@ -100,7 +103,36 @@ class AppModel {
     return res._sum.amount;
   }
 
-  async sumBetween(from: String, to: String) {
+  /**
+   * Get Sum of expenses from the last 7 days
+   * @returns {Promise<number>}
+   */
+  async sum7Days(): Promise<number> {
+    return await this.calculateSumFromDaysToToday(7);
+  }
+
+  async sum30Days(): Promise<number> {
+    return await this.calculateSumFromDaysToToday(30);
+  }
+
+  /**
+   * Get the sum of expenses from n days to today
+   * @param days {number} sum from n days to today
+   * @returns {Promise<number>}
+   */
+  async calculateSumFromDaysToToday(days: number): Promise<number> {
+    const aWeekAgo = new Date();
+    aWeekAgo.setDate(aWeekAgo.getDate() - days);
+    const dateLatest = this.getDateBreakdown();
+    const dateAWeekAgo = this.getDateBreakdown(format(aWeekAgo, "yyyy-MM-dd"));
+
+    const start = String(dateAWeekAgo.startTime);
+    const end = String(dateLatest.endTime);
+
+    return await this.sumBetween(start, end);
+  }
+
+  async sumBetween(from: String, to: String): Promise<number | any> {
     const fromValidate = DateTimeSchema.safeParse(from);
     const toValidate = DateTimeSchema.safeParse(to);
     const user = await currentUser();
