@@ -3,67 +3,63 @@ import Days from "./date";
 
 interface DateExp {
   name: string;
-  count: number;
+  amount: number;
 }
 
 class TodayModel extends AppModel {
-  async getToday() {
-    return await this.findOne();
-  }
 
+  /**
+   * Get the sum of expenses for Date
+   * @param date '2024-07-31'
+   * @returns 
+   */
   async sumWithDate(date: string): Promise<number> {
-    const wholeDay = await this.findAll({
-      filter: `created ~ '${date}'`,
-      fields: "amount",
-    });
-
-    if (wholeDay.length) {
-      const total = wholeDay.reduce((acc, item) => acc + item.amount, 0);
-      return total as number;
-    } else {
-      return 0;
-    }
+    const { startTime, endTime } = this.getDateBreakdown(date);
+    const sum = await this.sumBetween(String(startTime), String(endTime));
+    return sum ?? 0;
   }
 
-  async sumThisWeek() {
+
+  /**
+   * Gets the sum of expenses each day for the last 7 days
+   * @returns {Promise<DateExp[]>}
+   */
+  async sumThisWeek(): Promise<DateExp[]> {
     const dates = Days.daysLastWeek();
     const dateExp: DateExp[] = [] as DateExp[];
 
-    const total = await Promise.all(
+    await Promise.all(
       dates.map(async (date) => {
         dateExp.unshift({
           name: date.date_formatted,
-          count: await this.sumWithDate(date.date),
+          amount: await this.sumWithDate(date.date),
         });
       })
     );
     return dateExp.sort((a, b) => (a.name < b.name ? 1 : -1));
   }
 
-  async sumPastWeeks() {
-    const WeeksCondition = Days.lastNumWeeks(5);
+  /**
+   * Get the sum of expenses for the last n weeks
+   * @returns {Promise<DateExp[]>}
+   */
+  async sumPastWeeks(): Promise<DateExp[]> {
+    const startEndWeeks = Days.getWeekStartEnd(5);
+
     const dateExp = await Promise.all(
-      WeeksCondition.map(async (condition) => {
-        return await this.findAll({
-          filter: condition,
-          sort: "-created",
-        });
-      })
-    );
-    const sum: DateExp[] = [] as DateExp[];
-    dateExp.forEach((week, i) => {
-      const total = week.reduce((acc, item) => acc + item.amount, 0);
-      sum.push({ name: `${i + 1}`, count: total });
-    });
-    return sum;
+      startEndWeeks.map(async (week, i) => {
+        const start = this.getDateBreakdown(week[0]);
+        const end = this.getDateBreakdown(week[1]);
+        const sum = await this.sumBetween(String(start.startTime), String(end.endTime));
+        return {name: String(i+1), amount: sum ?? 0};
+      }
+    ));
+
+    return dateExp;
   }
 }
 
 const Today = new TodayModel("expense_today");
-const ThisWeek = new TodayModel("expense_week");
-const ThisMonth = new TodayModel("expense_month");
-const PastWeek = new TodayModel("expense_past_7d");
-const PastMonth = new TodayModel("expense_past_30d");
 const Expenses = new TodayModel("expenses");
 
-export { Today, ThisWeek, ThisMonth, PastWeek, PastMonth, Expenses };
+export { Today, Expenses };

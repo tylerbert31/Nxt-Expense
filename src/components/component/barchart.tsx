@@ -9,7 +9,7 @@ const BarChart = async (props: any) => {
     <div {...props}>
       <ResponsiveBar
         data={data}
-        keys={["count"]}
+        keys={["amount"]}
         indexBy="name"
         margin={{ top: 0, right: 0, bottom: 40, left: 40 }}
         padding={0.3}

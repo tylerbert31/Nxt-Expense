@@ -3,8 +3,8 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
   return (
-    <div className="grid place-items-center min-h-svh">
+    <main className="grid place-items-center min-h-svh auth_div">
       <SignIn />
-    </div>
+    </main>
   );
 }

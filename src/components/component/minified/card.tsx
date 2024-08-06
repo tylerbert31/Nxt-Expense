@@ -1,5 +1,5 @@
 import React from "react";
-import { Today, PastWeek, PastMonth } from "@/lib/model/pocketbase";
+import { Today, Expenses } from "@/lib/model/pocketbase";
 import numeral from "numeral";
 import { unstable_noStore as noCache } from "next/cache";
 
@@ -31,7 +31,7 @@ const TodayCard = async () => {
 };
 
 const Last7DaysCard = async () => {
-  const pastweek = await PastWeek.sum7Days();
+  const pastweek = await Expenses.sum7Days();
   const caption: string = "Last 7 Days";
   return (
     <CardTemplate
@@ -42,7 +42,7 @@ const Last7DaysCard = async () => {
 };
 
 const Last30DaysCard = async () => {
-  const pastmonth = await PastMonth.sum30Days();
+  const pastmonth = await Expenses.sum30Days();
   const caption: string = "Last 30 Days";
   return (
     <CardTemplate

@@ -47,6 +47,26 @@ class Days {
 
     return condition_formatted;
   }
+
+  /**
+   * Get First and Last day of previous 7 days
+   * @param weekLength How many weeks to get
+   * @returns [[WeekStart, WeekEnd], [WeekStart, WeekEnd], ...]
+   */
+  getWeekStartEnd(weekLength: number = 4){
+    const weeksNum: number[] = Array.from({ length: weekLength }, (_, i) => i + 1);
+    const week: string[][] = [];
+    weeksNum.forEach((weekNum) => {
+      const daysThisWeek = this.daysThisWeek(weekNum);
+      week[weekNum - 1] = daysThisWeek.map((day) => day.date);
+    });
+
+    const condition_formatted: string[][] = week.map((week) => {
+      return [week[0], week[6]];
+    });
+
+    return condition_formatted;
+  }
 }
 
 export default new Days();
