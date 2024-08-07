@@ -4,10 +4,12 @@ import { currentUser } from "@clerk/nextjs/server";
 import { ExpenseSchema, DateTimeSchema, DateSchema } from "../types";
 import { format } from "date-fns";
 import { z } from "zod";
+import NodeCache from "node-cache";
 
 export const prisma = new PrismaClient();
-
 export const pb = new PocketBase(process.env.PB_URL);
+const memCache = new NodeCache({ stdTTL: 60 * 60 * 1 });
+
 pb.autoCancellation(false);
 
 class AppModel {
@@ -80,27 +82,16 @@ class AppModel {
    * @returns {Promise<number | any>}
    */
   async sumToday(): Promise<number | any> {
-    const { year, month, day } = this.getDateBreakdown();
+    const { year, month, day, startTime, endTime } = this.getDateBreakdown();
     const user = await currentUser();
 
     if (!user) {
       return { message: "Unauthorized" };
     }
 
-    const res = await prisma.expense.aggregate({
-      _sum: {
-        amount: true,
-      },
-      where: {
-        user_id: user.id,
-        customCreatedAt: {
-          gte: new Date(Date.UTC(year, month, day, 0, 0, 0)),
-          lte: new Date(Date.UTC(year, month, day, 23, 59, 59)),
-        },
-      },
-    });
+    const data = this.sumBetween(String(startTime), String(endTime));
 
-    return res._sum.amount;
+    return data;
   }
 
   /**
@@ -108,11 +99,31 @@ class AppModel {
    * @returns {Promise<number>}
    */
   async sum7Days(): Promise<number> {
-    return await this.calculateSumFromDaysToToday(7);
+    const cacheKey = `sum7Days`;
+    const cache = await this.getCache(cacheKey);
+
+    if(cache){
+      return cache as number;
+    }
+
+    const data =  await this.calculateSumFromDaysToToday(7);
+    this.setCache(cacheKey, data);
+
+    return data;
   }
 
   async sum30Days(): Promise<number> {
-    return await this.calculateSumFromDaysToToday(30);
+    const cacheKey = `sum30Days`;
+    const cache = await this.getCache(cacheKey);
+
+    if(cache){
+      return cache as number;
+    }
+
+    const data =  await this.calculateSumFromDaysToToday(30);
+    this.setCache(cacheKey, data);
+
+    return data;
   }
 
   /**
@@ -283,6 +294,55 @@ class AppModel {
     ).toISOString();
 
     return { year, month, day, startTime, endTime };
+  }
+
+  /**
+   * Set Cache data
+   * @param key {string} Cache Key
+   * @param data {any} Data to be cached
+   */
+  async setCache(key: string, data: any) {
+    const user = await currentUser();
+    if (!user) {
+      return;
+    }
+
+    const userKey = `${user.id}-${key}`;
+    memCache.set(userKey, data);
+    console.log(`Cache set : ${userKey}`);
+  }
+
+  /**
+   * Get cached data
+   * @param key {string} Cache Key
+   */
+  async getCache(key: string) {
+    const user = await currentUser();
+    if (!user) {
+      return;
+    }
+
+    const userKey = `${user.id}-${key}`;
+    const cachedData =  memCache.get(userKey);
+
+    if(cachedData){
+      console.log(`Cache hit : ${userKey}`);
+    }
+    return cachedData;
+  }
+
+  /**
+   * Delete cached data
+   * @param key {string} Cache Key
+   */
+  async deleteCache(key: string) {
+    const user = await currentUser();
+    if (!user) {
+      return;
+    }
+
+    const userKey = `${user.id}-${key}`;
+    memCache.del(userKey);
   }
 }
 

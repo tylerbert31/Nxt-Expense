@@ -28,6 +28,13 @@ class TodayModel extends AppModel {
     const dates = Days.daysLastWeek();
     const dateExp: DateExp[] = [] as DateExp[];
 
+    const cacheKey = `sumThisWeek`;
+    const cache = await this.getCache(cacheKey);
+
+    if(cache){
+      return cache as DateExp[];
+    }
+
     await Promise.all(
       dates.map(async (date) => {
         dateExp.unshift({
@@ -36,7 +43,11 @@ class TodayModel extends AppModel {
         });
       })
     );
-    return dateExp.sort((a, b) => (a.name < b.name ? 1 : -1));
+
+    const data =  dateExp.sort((a, b) => (a.name < b.name ? 1 : -1));
+    this.setCache(cacheKey, data);
+
+    return data;
   }
 
   /**
@@ -44,6 +55,13 @@ class TodayModel extends AppModel {
    * @returns {Promise<DateExp[]>}
    */
   async sumPastWeeks(): Promise<DateExp[]> {
+    const cacheKey = `sumPastWeeks`;
+    const cache = await this.getCache(cacheKey);
+
+    if(cache){
+      return cache as DateExp[];
+    }
+
     const startEndWeeks = Days.getWeekStartEnd(5);
 
     const dateExp = await Promise.all(
@@ -54,6 +72,8 @@ class TodayModel extends AppModel {
         return {name: String(i+1), amount: sum ?? 0};
       }
     ));
+
+    this.setCache(cacheKey, dateExp);
 
     return dateExp;
   }
