@@ -14,6 +14,7 @@ pb.autoCancellation(false);
 
 class AppModel {
   collection: string;
+  user: any;
 
   constructor(collection_name: string) {
     this.collection = collection_name;
@@ -99,29 +100,29 @@ class AppModel {
    * @returns {Promise<number>}
    */
   async sum7Days(): Promise<number> {
-    const cacheKey = `sum7Days`;
-    const cache = await this.getCache(cacheKey);
+    // const cacheKey = `sum7Days`;
+    // const cache = await this.getCache(cacheKey);
 
-    if(cache){
-      return cache as number;
-    }
+    // if(cache != null){
+    //   return cache as number;
+    // }
 
     const data =  await this.calculateSumFromDaysToToday(7);
-    this.setCache(cacheKey, data);
+    // this.setCache(cacheKey, data);
 
     return data;
   }
 
   async sum30Days(): Promise<number> {
-    const cacheKey = `sum30Days`;
-    const cache = await this.getCache(cacheKey);
+    // const cacheKey = `sum30Days`;
+    // const cache = await this.getCache(cacheKey);
 
-    if(cache){
-      return cache as number;
-    }
+    // if(cache != null){
+    //   return cache as number;
+    // }
 
     const data =  await this.calculateSumFromDaysToToday(30);
-    this.setCache(cacheKey, data);
+    // this.setCache(cacheKey, data);
 
     return data;
   }
@@ -210,29 +211,30 @@ class AppModel {
     }
   }
 
-  async save(data: z.infer<typeof ExpenseSchema>) {
+  async save(data: z.infer<typeof ExpenseSchema>): Promise<boolean | any> {
     const validate = ExpenseSchema.safeParse(data);
     const user = await currentUser();
+    this.user = user;
 
     if (!validate.success) {
-      return { message: validate.error.flatten().fieldErrors };
+      return { message: validate.error.flatten().fieldErrors, status: 400 };
     }
 
     if (!user) {
-      return { message: "User not found" };
+      return { message: "User not found", status: 401 };
     }
 
     try {
-      const res = await prisma.expense.create({
+      await prisma.expense.create({
         data: {
           user_id: user.id,
           ...data,
         },
-      });
+      })
 
-      return res;
+      return true;
     } catch (error) {
-      return error;
+      return false;
     }
   }
 
@@ -335,11 +337,13 @@ class AppModel {
    * Delete cached data
    * @param key {string} Cache Key
    */
-  async deleteCache(key: string) {
-    const user = await currentUser();
+  deleteCache(key: string) {
+    const user = this.user;
     if (!user) {
       return;
     }
+
+    console.log(`Cache deleted : ${user.id}-${key}`);
 
     const userKey = `${user.id}-${key}`;
     memCache.del(userKey);

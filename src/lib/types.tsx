@@ -13,52 +13,68 @@ export const ExpenseSchema = z.object({
     message: "Amount should be greater than 0",
   }),
   description: z.string().min(3),
+  category: z.number().int().min(0).max(10),
   customCreatedAt: z.string().datetime().optional(),
 });
 
 export const DateTimeSchema = z.string().datetime();
 export const DateSchema = z.string().date().optional().nullable();
-export const ExpenseCategorySchema = z.number().int().min(0).max(9);
 
-export const ExpCategory = {
-  "0": {
-    text: "Housing",
-    emoji: "🏠",
-  },
-  "1": {
-    text: "Utilities",
-    emoji: "💡",
-  },
-  "2": {
+export const ExpCategory = [
+  {
+    id: 0,
     text: "Food",
     emoji: "🍽️",
   },
-  "3": {
+  {
+    id: 1,
+    text: "Housing",
+    emoji: "🏠",
+  },
+  {
+    id: 2,
+    text: "Utilities",
+    emoji: "💡",
+  },
+  {
+    id: 3,
     text: "Transportation",
     emoji: "🚗",
   },
-  "4": {
+  {
+    id: 4,
     text: "Healthcare",
     emoji: "💊",
   },
-  "5": {
+  {
+    id: 5,
     text: "Entertainment",
     emoji: "🎉",
   },
-  "6": {
+  {
+    id: 6,
     text: "Clothing",
     emoji: "👗",
   },
-  "7": {
+  {
+    id: 7,
     text: "Savings",
     emoji: "💰",
   },
-  "8": {
+  {
+    id: 8,
     text: "Education",
     emoji: "📚",
   },
-  "9": {
+  {
+    id: 9,
     text: "Miscellaneous",
     emoji: "📦",
   },
-};
+  {
+    id: 10,
+    text: "Other",
+    emoji: "💸",
+  }
+];
+

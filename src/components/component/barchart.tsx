@@ -3,8 +3,8 @@
 import { ResponsiveBar } from "@nivo/bar";
 import React from "react";
 
-const BarChart = async (props: any) => {
-  const data = await props.expense;
+const BarChart =  (props: any) => {
+  const data = props.expense;
   return (
     <div {...props}>
       <ResponsiveBar
