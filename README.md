@@ -64,7 +64,7 @@ Welcome to the **Multi-Tenant NextJS Expense Tracker**! This application allows 
 
     ```env
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your-clerk-publishable-key>
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
     NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
     DATABASE_URL=<your-postgres-url>
     ```
