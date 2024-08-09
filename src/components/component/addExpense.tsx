@@ -133,7 +133,6 @@ export default function AddExpense(){
                                                                 {`${category.emoji} ${category.text}`}
                                                             </SelectItem>
                                                         ))}
-                                                        <SelectItem value="pineapple">Pineapple</SelectItem>
                                                     </SelectGroup>
                                                 </SelectContent>
                                             </Select>
