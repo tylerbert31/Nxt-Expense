@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Multi-Tenant NextJS Expense Tracker with Clerk Auth
 
-## Getting Started
+![Expense Tracker Icon Soon](./assets/expense-tracker.png)
 
-First, run the development server:
+Welcome to the **Multi-Tenant NextJS Expense Tracker**! This application allows multiple users to manage their expenses seamlessly using **Next.js** for the frontend and backend and **Clerk** for authentication.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Multi-Tenant Architecture**: Separate data for different users.
+- **User Authentication**: Secure authentication using Clerk.
+- **Expense Management**: Track and categorize your expenses.
+- **Responsive Design**: Works on desktop and mobile devices.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Table of Contents
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Learn More
+## Screenshots
 
-To learn more about Next.js, take a look at the following resources:
+### Dashboard
+![Dashboard Screenshot Soon](./assets/dashboard.png)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Expense Form
+![Expense Form Screenshot Soon](./assets/expense-form.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+- **Frontend**: [Next.js](https://nextjs.org/)
+- **Authentication**: [Clerk](https://clerk.dev/)
+- **Database**: PostgreSQL
+- **Deployment**: [Vercel](https://vercel.com/) or [Netlify](https://www.netlify.com/)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/tylerbert31/Nxt-Expense.git
+    ```
+
+2. **Navigate to the project directory:**
+
+    ```bash
+    cd Nxt-Expense
+    ```
+
+3. **Install dependencies:**
+
+    ```bash
+    npm install
+    npx prisma generate
+    npx prisma db push
+    ```
+
+4. **Set up environment variables:**
+
+    Create a `.env.local` file in the root of the project and add your Clerk API keys and other configuration:
+
+    ```env
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your-clerk-publishable-key>
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+    DATABASE_URL=<your-postgres-url>
+    ```
+
+5. **Run the development server:**
+
+    ```bash
+    npm run dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
+
+## Usage
+
+1. **Sign Up / Sign In**: Use Clerk authentication to create an account or sign in.
+2. **Add Expenses**: Click the "Add expense" on the homepage to add a new expense.
+3. **View Dashboard**: Access your expense dashboard to track and manage your expenses.
+
+## Contributing
+
+Feel free to submit issues and pull requests. Here are a few ways you can contribute:
+
+- Report bugs
+- Suggest features
+
+For more details on contributing, please check out the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
+
+---
+
+Make sure to replace the placeholder links and paths with actual ones relevant to your project. If you want to add images, create an `assets` directory in your repo and put your images there, then use relative paths as shown.
