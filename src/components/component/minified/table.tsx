@@ -28,7 +28,7 @@ const PurchaseTable = () => {
 const PurchaseTableData = () => {
   // Todo: Implement pagination
   const [page, setPage] = React.useState<number>(1);
-  const { data, isLoading, refetch } = getExpensePurchase(page);
+  const { data, isLoading, refetch } = getExpensePurchase();
   const result = data?.data?.data;
   const items = result?.items;
 

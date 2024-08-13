@@ -55,6 +55,7 @@ class AppModel {
           id: true,
           amount: true,
           description: true,
+          category: true,
           customCreatedAt: true,
         },
       });
@@ -82,8 +83,8 @@ class AppModel {
    * Find the sum of expenses for today
    * @returns {Promise<number | any>}
    */
-  async sumToday(): Promise<number | any> {
-    const { year, month, day, startTime, endTime } = this.getDateBreakdown();
+  async sumToday(date: string | null = null): Promise<number | any> {
+    const { year, month, day, startTime, endTime } = this.getDateBreakdown(date);
     const user = await currentUser();
 
     if (!user) {

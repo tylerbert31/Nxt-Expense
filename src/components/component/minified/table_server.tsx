@@ -9,6 +9,7 @@ import {
   } from "@/components/ui/table";
   import { formatDistance } from "date-fns";
 import { Expenses } from "@/lib/model/pocketbase";
+import { ExpCategory } from "@/lib/types";
 
 export default async function PurchaseTable(){
 
@@ -34,7 +35,7 @@ export default async function PurchaseTable(){
                             addSuffix: true,
                         })}
                         </TableCell>
-                        <TableCell>{item.description}</TableCell>
+                        <TableCell>{`${ExpCategory[item.category].emoji} ${item.description}`}</TableCell>
                         <TableCell>₱ {item.amount}</TableCell>
                     </TableRow>
                     ))}

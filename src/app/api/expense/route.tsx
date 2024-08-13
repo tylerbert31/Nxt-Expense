@@ -27,3 +27,11 @@ export async function POST(req: Request) {
 
   return NextResponse.json(resData, { status: status });
 }
+
+export async function GET(req: Request) {
+  const user = await currentUser();
+  let status = 200;
+  let resData = { message: "Success" };
+
+  return NextResponse.json(resData, { status: status });
+}
