@@ -131,7 +131,7 @@ export function AllPurchases(
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dateRange" className="text-sm">
-                    Date Range
+                    Date
                   </Label>
                   <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                     <PopoverTrigger asChild>
