@@ -1,14 +1,17 @@
 import PocketBase from "pocketbase";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { currentUser } from "@clerk/nextjs/server";
 import { ExpenseSchema, DateTimeSchema, DateSchema } from "../types";
 import { format } from "date-fns";
 import { z } from "zod";
 import NodeCache from "node-cache";
+import { TypeGet } from "../types";
 
 export const prisma = new PrismaClient();
 export const pb = new PocketBase(process.env.PB_URL);
 const memCache = new NodeCache({ stdTTL: 60 * 60 * 1 });
+
+type ExpenseConditions = Prisma.ExpenseWhereInput;
 
 pb.autoCancellation(false);
 
@@ -24,18 +27,50 @@ class AppModel {
    *  Find all expenses of the current user
    * @example { count, items }
    */
-  async findMyExpenses(page: number = 1, limit: number = 10): Promise<any> {
+  async findMyExpenses(page: number = 1, limit: number = 10, condition: TypeGet | null = null): Promise<any> {
     const user = await currentUser();
 
     if (!user) {
       return { message: "Unauthorized", status: 401 };
     }
 
-    const userCondition = {
+    const userCondition: ExpenseConditions = {
       user_id: {
         equals: user.id,
       },
     };
+
+    if(condition?.description){
+      userCondition.description = {
+        contains: String(condition.description)
+      }
+    }
+
+    if(condition?.category && condition.category != 11){
+      userCondition.category = {
+        equals: condition.category
+      }
+    }
+
+    if(condition?.amountMin){
+      userCondition.amount = {
+        gte: condition.amountMin
+      }
+    }
+
+    if(condition?.amountMax){
+      userCondition.amount = {
+        lte: condition.amountMax
+      }
+    }
+
+    if(condition?.date){
+      const { startTime, endTime } = this.getDateBreakdown(String(condition.date));
+      userCondition.customCreatedAt = {
+        gte: String(startTime),
+        lte: String(endTime)
+      }
+    }
 
     const getCount = async () => {
       return await prisma.expense.count({

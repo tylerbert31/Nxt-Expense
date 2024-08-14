@@ -1,7 +1,7 @@
 
 "use client"
 
-import { FormEvent, useState } from "react"
+import { useState } from "react"
 import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -13,26 +13,28 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination"
 import { format } from "date-fns"
 import { useSearchParams } from "next/navigation"
-import { getExpensePurchase } from "@/lib/hooks/hook";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ExpCategory, ExpenseResults } from "@/lib/types"
+import { useRouter } from "next/navigation"
 
-const queryClient = new QueryClient();
+export function AllPurchases(
+  {
+    items,
+    pagination
+  }:
+  {
+    items: ExpenseResults[],
+    pagination: {
+      totalCount: number;
+      totalPages: number;
+      currentPage: number;
+    }
+  }) {
 
-export function AllPurchases() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AllPurchaseData />
-    </QueryClientProvider>
-  )
-}
-
-
-function AllPurchaseData() {
   const searchParams = useSearchParams()
 
   const GET = {
     description: searchParams.get("description") ?? "",
-    category: searchParams.get("category") ?? "0",
+    category: searchParams.get("category") ?? "11",
     amountMin: searchParams.get("amountMin") ?? "",
     amountMax: searchParams.get("amountMax") ?? "",
     date: searchParams.get("date") ?? undefined,
@@ -40,71 +42,21 @@ function AllPurchaseData() {
     page: searchParams.get("page") ?? "1",
   }
 
-  const { data: expenses, isLoading, refetch } = getExpensePurchase(searchParams.toString());
-
   const [date, setDate] = useState<Date | undefined>(GET.date ? new Date(GET.date) : undefined)
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
-  const data = [
-    {
-      id: 1,
-      date: "2023-06-01",
-      category: "Rent",
-      description: "Apartment rent for June",
-      amount: 1500,
-    },
-    {
-      id: 2,
-      date: "2023-06-05",
-      category: "Groceries",
-      description: "Weekly grocery shopping",
-      amount: 150.23,
-    },
-    {
-      id: 3,
-      date: "2023-06-10",
-      category: "Utilities",
-      description: "Electricity bill",
-      amount: 87.45,
-    },
-    {
-      id: 4,
-      date: "2023-06-15",
-      category: "Entertainment",
-      description: "Movie tickets",
-      amount: 25.99,
-    },
-    {
-      id: 5,
-      date: "2023-06-20",
-      category: "Rent",
-      description: "Apartment rent for July",
-      amount: 1500,
-    },
-    {
-      id: 6,
-      date: "2023-06-25",
-      category: "Groceries",
-      description: "Weekly grocery shopping",
-      amount: 175.67,
-    },
-    {
-      id: 7,
-      date: "2023-07-01",
-      category: "Utilities",
-      description: "Internet bill",
-      amount: 65.99,
-    },
-    {
-      id: 8,
-      date: "2023-07-05",
-      category: "Entertainment",
-      description: "Concert tickets",
-      amount: 150.0,
-    },
-  ]
+  const data = items;
+
+  const hasNextpage: Boolean = pagination.currentPage < pagination.totalPages
+  const hasPreviousPage: Boolean = pagination.currentPage > 1
+
+  const router = useRouter()
+
+  const resetFilters = () => {
+    window.location.href = "/recent"
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6 !bg-white rounded-md shadow">
       <div className="mb-6">
         <p className="text-sm text-muted-foreground sm:text-base">View and filter your recent expenses.</p>
@@ -119,6 +71,7 @@ function AllPurchaseData() {
             <SheetDescription></SheetDescription>
             <form className="mt-5">
               <input type="hidden" name="date" value={date ? format(date, 'yyyy-MM-dd') : ''} />
+              <input type="hidden" name="page" value={GET.page} />
               <div className="grid gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-sm">
@@ -143,11 +96,10 @@ function AllPurchaseData() {
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent className="!bg-white">
-                      <SelectItem value="0">All</SelectItem>
-                      <SelectItem value="Rent">Rent</SelectItem>
-                      <SelectItem value="Groceries">Groceries</SelectItem>
-                      <SelectItem value="Utilities">Utilities</SelectItem>
-                      <SelectItem value="Entertainment">Entertainment</SelectItem>
+                      <SelectItem value="11">All</SelectItem>
+                      { ExpCategory.map((category) => (
+                        <SelectItem key={category.id} value={String(category.id)}>{category.emoji} {category.text}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -226,9 +178,7 @@ function AllPurchaseData() {
                   <Button
                     variant="default"
                     type="button"
-                    onClick={() =>
-                      console.log("clear form")
-                    }
+                    onClick={resetFilters}
                   >
                     Reset Filters
                   </Button>
@@ -250,13 +200,13 @@ function AllPurchaseData() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data
+            {data && data
               .map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="text-sm">{item.date}</TableCell>
-                  <TableCell className="text-sm">{item.category}</TableCell>
+                  <TableCell className="text-sm">{item.customCreatedAt}</TableCell>
+                  <TableCell className="text-sm">{ExpCategory[item.category].emoji}</TableCell>
                   <TableCell className="text-sm">{item.description}</TableCell>
-                  <TableCell className="text-sm text-right">${item.amount.toFixed(2)}</TableCell>
+                  <TableCell className="text-sm text-right">₱{item.amount}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
@@ -266,12 +216,12 @@ function AllPurchaseData() {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <Button variant="default" size="sm" className="text-sm hover:shadow transition-shadow">
+              <Button disabled={hasPreviousPage ? true: false} variant="default" size="sm" className="text-sm hover:shadow transition-shadow">
                 Previous
               </Button>
             </PaginationItem>
             <PaginationItem>
-              <Button variant="default" size="sm" className="text-sm">
+              <Button disabled={hasNextpage ? true : false} variant="default" size="sm" className="text-sm">
                 Next
               </Button>
             </PaginationItem>
@@ -279,7 +229,6 @@ function AllPurchaseData() {
         </Pagination>
       </div>
     </div>
-    </QueryClientProvider>
   )
 }
 

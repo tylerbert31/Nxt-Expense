@@ -20,6 +20,41 @@ export const ExpenseSchema = z.object({
 export const DateTimeSchema = z.string().datetime();
 export const DateSchema = z.string().date().optional().nullable();
 
+
+export interface Query extends URLSearchParams{
+  description?: String;
+  category?: String;
+  amountMin?: String;
+  amountMax?: String;
+  date?: String;
+  perPage?: String;
+  page?: String;
+};
+
+export interface TypeGet {
+  description: String | null;
+  category: number | null;
+  amountMin: number | null;
+  amountMax: number | null;
+  date: String | null;
+  perPage: number;
+  page: number;
+}
+
+export type ExpenseResults = {
+  id: number;
+  amount: number;
+  description: string;
+  category: number;
+  customCreatedAt: string;
+}
+export interface TypeResults {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  items: ExpenseResults[];
+}
+
 export const ExpCategory = [
   {
     id: 0,

@@ -44,7 +44,7 @@ export async function Expense() {
         <div className="bg-white rounded-lg shadow p-4 mt-4">
           <div className="flex justify-between">
             <h2 className="text-lg font-bold mb-2">Recent</h2>
-            <Link href="/recent">
+            <Link href="/recent" prefetch={true}>
               <Button variant="link" className="!text-black">View all</Button>
             </Link>
           </div>
